@@ -1,4 +1,5 @@
 {
+  "declaration_keyword": "const",
   "lookup_paths": [
     "js",
     "node_modules"
