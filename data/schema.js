@@ -106,7 +106,7 @@ var issueType = new GraphQLObjectType({
     labels: {
       type: new GraphQLList(GraphQLString),
       description: 'List of labels associated with the issue',
-      resolve: issue => issue.labels,
+      resolve: issue => issue.labels.map(label => label.name),
     },
     state: {
       type: GraphQLString,
