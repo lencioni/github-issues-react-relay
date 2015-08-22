@@ -5,6 +5,9 @@ React.render(
   <Relay.RootContainer
     Component={App}
     route={new AppHomeRoute()}
+    renderLoading={() =>
+      <div>Loading...</div>
+    }
   />,
   document.getElementById('root')
 );
