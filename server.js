@@ -18,6 +18,7 @@ graphQLServer.listen(GRAPHQL_PORT, () => console.log(
 // Serve the Relay app
 var compiler = webpack({
   entry: path.resolve(__dirname, 'js', 'app.js'),
+  devtool: 'source-map',
   module: {
     loaders: [
       {
