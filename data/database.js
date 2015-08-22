@@ -17,7 +17,7 @@ function fetchIssue(number) {
   return fetch(`https://api.github.com/repos/npm/npm/issues/${number}`);
 }
 
-function fetchIssues(page, issuesCount, first) {
+function fetchIssues(page, issuesCount, count) {
   return new Promise((resolve, reject) => {
     fetch(`https://api.github.com/repos/npm/npm/issues?page=${page}`)
       .catch(err => reject(err))
@@ -41,8 +41,8 @@ function fetchIssues(page, issuesCount, first) {
           repo.issuesPerPage = json.length;
         }
 
-        if (page < repo.lastPage && issuesCount + json.length < first) {
-          fetchIssues(page + 1, issuesCount + json.length, first)
+        if (page < repo.lastPage && issuesCount + json.length < count) {
+          fetchIssues(page + 1, issuesCount + json.length, count)
             .catch(err => reject(err))
             .then(nextPage => json.push(...nextPage))
             .then(() => resolve(json));
@@ -53,20 +53,22 @@ function fetchIssues(page, issuesCount, first) {
   });
 }
 
-export function getIssues(first) {
+export function getIssues(count) {
+
   return new Promise((resolve, reject) => {
-    if (issues.length >= first) {
-      resolve(issues.slice(0, first));
+    if (issues.length >= count) {
+      return resolve(issues.slice(0, count));
     }
 
     // We don't have enough issues yet, so we need to fetch more pages until we
     // have enough.
     const nextPage = repo.issuesPerPage ?
       Math.floor(issues.length / repo.issuesPerPage) + 1 : 1;
-    fetchIssues(nextPage, issues.length, first)
+
+    fetchIssues(nextPage, issues.length, count)
       .catch(err => reject(err))
       .then(nextIssues => issues.push(...nextIssues))
-      .then(() => resolve(issues.slice(0, first)));
+      .then(() => resolve(issues.slice(0, count)));
   });
 }
 
