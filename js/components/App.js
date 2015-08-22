@@ -6,7 +6,7 @@ class App extends React.Component {
       <div>
         <h1>Issues</h1>
         {this.props.repo.issues.edges.map(issue =>
-          <Issue issue={issue.node} />
+          <Issue issue={issue.node} key={issue.node.id} />
         )}
       </div>
     );
