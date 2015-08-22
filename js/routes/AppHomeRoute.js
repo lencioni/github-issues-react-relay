@@ -1,10 +1,10 @@
 export default class extends Relay.Route {
   static path = '/';
   static queries = {
-    game: (Component) => Relay.QL`
+    viewer: (Component) => Relay.QL`
       query {
-        game {
-          ${Component.getFragment('game')},
+        viewer {
+          ${Component.getFragment('viewer')},
         },
       }
     `,
