@@ -2,8 +2,14 @@ class Issue extends React.Component {
   render() {
     return (
       <div>
-        {this.props.issue.title}
-        (number: {this.props.issue.number})
+        <h2>{this.props.issue.title}</h2>
+        <p>number: {this.props.issue.number}</p>
+        <p>state: {this.props.issue.state}</p>
+        <ul>
+          {this.props.issue.labels.map(label =>
+            <li>{label}</li>
+          )}
+        </ul>
       </div>
     );
   }
@@ -16,6 +22,8 @@ export default Relay.createContainer(Issue, {
         id,
         number,
         title,
+        labels,
+        state,
       }
     `,
   },
