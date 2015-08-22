@@ -1,13 +1,13 @@
+var Issue = require('./Issue');
+
 class App extends React.Component {
   render() {
     return (
       <div>
-        <h1>Widget list</h1>
-        <ul>
-          {this.props.viewer.widgets.edges.map(edge =>
-            <li>{edge.node.name} (ID: {edge.node.id})</li>
-          )}
-        </ul>
+        <h1>Issues</h1>
+        {this.props.repo.issues.edges.map(issue =>
+          <Issue issue={issue.node} />
+        )}
       </div>
     );
   }
@@ -15,13 +15,13 @@ class App extends React.Component {
 
 export default Relay.createContainer(App, {
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on User {
-        widgets(first: 10) {
+    repo: () => Relay.QL`
+      fragment on Repo {
+        id,
+        issues(first: 10) {
           edges {
             node {
-              id,
-              name,
+              ${Issue.getFragment('issue')},
             },
           },
         },

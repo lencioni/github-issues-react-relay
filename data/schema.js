@@ -23,6 +23,7 @@ import {
   connectionArgs,
   connectionDefinitions,
   connectionFromArray,
+  connectionFromPromisedArray,
   fromGlobalId,
   globalIdField,
   mutationWithClientMutationId,
@@ -30,13 +31,11 @@ import {
 } from 'graphql-relay';
 
 import {
-  // Import methods that your schema can use to interact with your database
-  User,
-  Widget,
-  getUser,
-  getViewer,
-  getWidget,
-  getWidgets,
+  Issue,
+  Repo,
+  getIssue,
+  getIssues,
+  getRepo,
 } from './database';
 
 /**
@@ -48,19 +47,20 @@ import {
 var {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
     var {type, id} = fromGlobalId(globalId);
-    if (type === 'User') {
-      return getUser(id);
-    } else if (type === 'Widget') {
-      return getWidget(id);
+    if (type === 'Repo') {
+      return getRepo(id);
+    } else if (type === 'Issue') {
+      // In this case, the id is the number of the issue.
+      return getIssue(id);
     } else {
       return null;
     }
   },
   (obj) => {
-    if (obj instanceof User) {
-      return userType;
-    } else if (obj instanceof Widget)  {
-      return widgetType;
+    if (obj instanceof Repo) {
+      return repoType;
+    } else if (obj instanceof Issue) {
+      return issueType;
     } else {
       return null;
     }
@@ -71,39 +71,79 @@ var {nodeInterface, nodeField} = nodeDefinitions(
  * Define your own types here
  */
 
-var userType = new GraphQLObjectType({
-  name: 'User',
-  description: 'A person who uses our app',
+var repoType = new GraphQLObjectType({
+  name: 'Repo',
+  description: 'A GitHub repo',
   fields: () => ({
-    id: globalIdField('User'),
-    widgets: {
-      type: widgetConnection,
-      description: 'A person\'s collection of widgets',
+    id: globalIdField('Repo'),
+    issues: {
+      type: issueConnection,
+      description: 'Issues that people have opened',
       args: connectionArgs,
-      resolve: (_, args) => connectionFromArray(getWidgets(), args),
+      resolve: (repo, args) => connectionFromPromisedArray(
+        getIssues(args.first), args),
     },
   }),
   interfaces: [nodeInterface],
 });
 
-var widgetType = new GraphQLObjectType({
-  name: 'Widget',
-  description: 'A shiny widget',
+var issueType = new GraphQLObjectType({
+  name: 'Issue',
+  description: 'A GitHub issue',
   fields: () => ({
-    id: globalIdField('Widget'),
-    name: {
+    id: globalIdField('Issue'),
+    number: {
+      type: GraphQLInt,
+      description: 'Number of the issue',
+      resolve: issue => issue.number,
+    },
+    title: {
       type: GraphQLString,
-      description: 'The name of the widget',
+      description: 'Title of the issue',
+      resolve: issue => issue.title,
+    },
+    // TODO user
+    labels: {
+      type: new GraphQLList(GraphQLString),
+      description: 'List of labels associated with the issue',
+      resolve: issue => issue.labels,
+    },
+    state: {
+      type: GraphQLString,
+      description: 'State the issue is in (e.g. open or closed)',
+      resolve: issue => issue.state,
+    },
+    locked: {
+      type: GraphQLBoolean,
+      description: 'Whether or not the issue is locked',
+      resolve: issue => issue.locked,
+    },
+    body: {
+      type: GraphQLString,
+      description: 'The body of the issue',
+      resolve: issue => issue.body,
+    },
+    createdAt: {
+      type: GraphQLString,
+      description: 'Time the issue was created',
+      resolve: issue => issue.created_at,
+    },
+    updatedAt: {
+      type: GraphQLString,
+      description: 'Time the issue was last updated',
+      resolve: issue => issue.updated_at,
+    },
+    closedAt: {
+      type: GraphQLString,
+      description: 'Time the issue was closed',
+      resolve: issue => issue.closed_at,
     },
   }),
   interfaces: [nodeInterface],
 });
 
-/**
- * Define your own connection types here
- */
-var {connectionType: widgetConnection} =
-  connectionDefinitions({name: 'Widget', nodeType: widgetType});
+const { connectionType: issueConnection } =
+  connectionDefinitions({ name: 'Issue', nodeType: issueType });
 
 /**
  * This is the type that will be the root of our query,
@@ -113,10 +153,9 @@ var queryType = new GraphQLObjectType({
   name: 'Query',
   fields: () => ({
     node: nodeField,
-    // Add your own root fields here
-    viewer: {
-      type: userType,
-      resolve: () => getViewer(),
+    repo: {
+      type: repoType,
+      resolve: () => getRepo(),
     },
   }),
 });
