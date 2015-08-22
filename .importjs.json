@@ -1,0 +1,12 @@
+{
+  "lookup_paths": [
+    "js",
+    "node_modules"
+  ],
+  "excludes": [
+    "node_modules/**/node_modules/**"
+  ],
+  "aliases": {
+    "fetch": "node-fetch"
+  }
+}
