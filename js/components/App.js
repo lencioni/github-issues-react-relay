@@ -19,9 +19,6 @@ class App extends React.Component {
     return (
       <div
         style={{
-          fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-          fontSize: 16,
-          lineHeight: 1.45,
           margin: '0 auto',
           maxWidth: 900,
           padding: '0 20px',
