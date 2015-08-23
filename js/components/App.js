@@ -27,7 +27,7 @@ class App extends React.Component {
           padding: '0 20px',
         }}
         >
-        <h1>Issues</h1>
+        <h1>{this.props.repo.name} Issues</h1>
         {this.props.repo.issues.edges.map(issue =>
           <IssueSummary issue={issue.node} key={issue.node.id} />
         )}
@@ -50,6 +50,7 @@ export default Relay.createContainer(App, {
     repo: () => Relay.QL`
       fragment on Repo {
         id,
+        name,
         issues(first: $count) {
           edges {
             node {

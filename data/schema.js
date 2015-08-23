@@ -82,6 +82,11 @@ var repoType = new GraphQLObjectType({
   description: 'A GitHub repo',
   fields: () => ({
     id: globalIdField('Repo'),
+    name: {
+      type: GraphQLString,
+      description: 'The name of the repo',
+      resolve: repo => repo.id,
+    },
     issues: {
       type: issueConnection,
       description: 'Issues that people have opened',
