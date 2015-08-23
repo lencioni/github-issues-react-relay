@@ -2,6 +2,7 @@ const Card = require('./Card');
 const Label = require('./Label');
 const TruncateLongLines = require('./TruncateLongLines');
 const truncateString = require('../lib/truncateString');
+const { Link } = require('react-router');
 
 class IssueSummary extends React.Component {
   render() {
@@ -18,7 +19,9 @@ class IssueSummary extends React.Component {
           }}
           >
           <TruncateLongLines>
-            {issue.title}
+            <Link to={`/issues/${issue.id}`}>
+              {issue.title}
+            </Link>
           </TruncateLongLines>
         </div>
 
@@ -76,6 +79,7 @@ export default Relay.createContainer(IssueSummary, {
   fragments: {
     issue: () => Relay.QL`
       fragment on Issue {
+        id,
         body,
         labels {
           id,
