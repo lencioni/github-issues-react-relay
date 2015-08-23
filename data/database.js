@@ -61,43 +61,40 @@ function fetchIssues(page, issuesCount, count) {
   });
 }
 
-export function getIssues({ after, first }) {
-  return new Promise((resolve, reject) => {
-    let count;
-    if (!after) {
-      count = first;
-    } else {
-      // Iterate backwards over the items we have looking at their cursors to
-      // find what after is pointing to. We are iterating backwards because the
-      // cursor is likely to be very close to the end because our issues array
-      // contains what we have from GitHub so far.
-      for (let i = issues.length - 1; i >= 0; i--) {
-        const issue = issues[i];
-        const cursor = cursorForObjectInConnection(issues, issue);
-        if (cursor === after) {
-          count = i + 1 + first;
-        }
+export async function getIssues({ after, first }) {
+  let count;
+  if (!after) {
+    count = first;
+  } else {
+    // Iterate backwards over the items we have looking at their cursors to
+    // find what after is pointing to. We are iterating backwards because the
+    // cursor is likely to be very close to the end because our issues array
+    // contains what we have from GitHub so far.
+    for (let i = issues.length - 1; i >= 0; i--) {
+      const issue = issues[i];
+      const cursor = cursorForObjectInConnection(issues, issue);
+      if (cursor === after) {
+        count = i + 1 + first;
       }
     }
+  }
 
-    // Always fetch at least 1 extra, so that Relay always knows if we have
-    // another page.
-    count++;
+  // Always fetch at least 1 extra, so that Relay always knows if we have
+  // another page.
+  count++;
 
-    if (issues.length >= count) {
-      return resolve(issues);
-    }
+  if (issues.length >= count) {
+    return issues;
+  }
 
-    // We don't have enough issues yet, so we need to fetch more pages until we
-    // have enough.
-    const nextPage = repo.issuesPerPage ?
-      Math.floor(issues.length / repo.issuesPerPage) + 1 : 1;
+  // We don't have enough issues yet, so we need to fetch more pages until we
+  // have enough.
+  const nextPage = repo.issuesPerPage ?
+    Math.floor(issues.length / repo.issuesPerPage) + 1 : 1;
 
-    fetchIssues(nextPage, issues.length, count)
-      .catch(err => reject(err))
-      .then(nextIssues => issues.push(...nextIssues))
-      .then(() => resolve(issues));
-  });
+  const nextIssues = await fetchIssues(nextPage, issues.length, count);
+  issues.push(...nextIssues);
+  return issues;
 }
 
 export function getIssue(number) {
