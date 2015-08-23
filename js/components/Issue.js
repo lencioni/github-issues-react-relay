@@ -1,6 +1,7 @@
 const IssueByline = require('./IssueByline');
 const IssueLabels = require('./IssueLabels');
 const PageContainer = require('./PageContainer');
+const TruncateLongLines = require('./TruncateLongLines');
 
 class Issue extends React.Component {
   render() {
@@ -10,7 +11,11 @@ class Issue extends React.Component {
 
     return (
       <PageContainer>
-        <h1>{issue.title}</h1>
+        <h1>
+          <TruncateLongLines>
+            {issue.title}
+          </TruncateLongLines>
+        </h1>
 
         <div>
           <IssueByline issue={issue} />
