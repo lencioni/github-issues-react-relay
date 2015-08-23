@@ -10,16 +10,18 @@ class IssueByline extends React.Component {
         {' '}
         opened by
         {' '}
-        <img
-          alt=''
-          src={issue.user.avatarUrl}
-          style={{
-            height: '.85em',
-            width: '.85em',
-          }}
-        />
-        {' '}
-        {issue.user.login}
+        <a href={`https://github.com/${issue.user.login}`}>
+          <img
+            alt=''
+            src={issue.user.avatarUrl}
+            style={{
+              height: '.85em',
+              width: '.85em',
+            }}
+          />
+          {' '}
+          {issue.user.login}
+        </a>
       </span>
     );
   }
