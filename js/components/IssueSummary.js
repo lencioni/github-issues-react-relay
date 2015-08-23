@@ -16,6 +16,7 @@ class IssueSummary extends React.Component {
 
         <div>
           by {issue.user.login}
+          <img src={issue.user.avatarUrl} height={50} width={50}/>
         </div>
 
         <div>
@@ -47,6 +48,7 @@ export default Relay.createContainer(IssueSummary, {
         number,
         title,
         user {
+          avatarUrl,
           login,
         }
       }

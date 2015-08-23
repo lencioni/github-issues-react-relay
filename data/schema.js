@@ -182,6 +182,11 @@ var userType = new GraphQLObjectType({
       description: "The user's username",
       resolve: user => user.login,
     },
+    avatarUrl: {
+      type: GraphQLString,
+      description: "The URL for the user's avatar",
+      resolve: user => user.avatar_url,
+    },
   }),
   interfaces: [nodeInterface],
 });
