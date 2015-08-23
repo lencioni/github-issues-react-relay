@@ -17,7 +17,16 @@ class App extends React.Component {
     const transaction = transactions ? transactions[0] : null;
 
     return (
-      <div>
+      <div
+        style={{
+          fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+          fontSize: 16,
+          lineHeight: 1.45,
+          margin: '0 auto',
+          maxWidth: 900,
+          padding: '0 20px',
+        }}
+        >
         <h1>Issues</h1>
         {this.props.repo.issues.edges.map(issue =>
           <IssueSummary issue={issue.node} key={issue.node.id} />

@@ -1,3 +1,4 @@
+const Card = require('./Card');
 const truncateString = require('../lib/truncateString');
 
 class IssueSummary extends React.Component {
@@ -7,30 +8,55 @@ class IssueSummary extends React.Component {
     } = this.props;
 
     return (
-      <div>
-        <div>
-          #{issue.number}
-          {' '}
+      <Card>
+        <div
+          style={{
+            fontWeight: 'bold',
+          }}
+          >
           {issue.title}
         </div>
 
-        <div>
-          by {issue.user.login}
-          <img src={issue.user.avatarUrl} height={50} width={50}/>
+        <div
+          style={{
+            fontSize: 13,
+          }}
+          >
+          #{issue.number}
+          {' '}
+          opened by
+          {' '}
+          <img
+            alt=''
+            src={issue.user.avatarUrl}
+            style={{
+              height: '.85em',
+              width: '.85em',
+            }}
+          />
+          {' '}
+          {issue.user.login}
         </div>
 
-        <div>
+        <div
+          style={{
+            color: '#888',
+            fontSize: 13,
+          }}
+          >
           {truncateString(issue.body, 140)}
         </div>
 
-        <ul>
-          {issue.labels.map(label =>
-            <li key={label.id} style={{ color: `#${label.color}` }}>
-              {label.name}
-            </li>
-          )}
-        </ul>
-      </div>
+        {issue.labels.count > 0 &&
+          <ul>
+            {issue.labels.map(label =>
+              <li key={label.id} style={{ color: `#${label.color}` }}>
+                {label.name}
+              </li>
+            )}
+          </ul>
+        }
+      </Card>
     );
   }
 }
