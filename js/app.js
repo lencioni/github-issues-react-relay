@@ -2,6 +2,7 @@ import {Router, Route} from 'react-router';
 import BrowserHistory from 'react-router/lib/BrowserHistory';
 
 import Home from './components/Home';
+import Issue from './components/Issue';
 
 function createRelayContainer(Component, props) {
   if (Relay.isContainer(Component)) {
@@ -29,6 +30,16 @@ const HomeQueries = {
   `,
 };
 
+const IssueQueries = {
+  issue: (Component) => Relay.QL`
+    query {
+      issue {
+        ${Component.getFragment('issue')},
+      },
+    }
+  `,
+};
+
 React.render(
   <Router history={new BrowserHistory()} createElement={createRelayContainer}>
     <Route>
@@ -37,6 +48,12 @@ React.render(
         path='/'
         component={Home}
         queries={HomeQueries}
+      />
+      <Route
+        name='issue'
+        path='/issues/:id'
+        component={Issue}
+        queries={IssueQueries}
       />
     </Route>
   </Router>,

@@ -44,6 +44,7 @@ var app = new WebpackDevServer(compiler, {
 
 // Serve static resources
 app.use('/', express.static('public'));
+app.use('/issues/:id', express.static('public'));
 app.use('/node_modules/react', express.static('node_modules/react'));
 app.use('/node_modules/react-relay', express.static('node_modules/react-relay'));
 app.listen(APP_PORT, () => {

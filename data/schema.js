@@ -211,6 +211,10 @@ var queryType = new GraphQLObjectType({
       type: repoType,
       resolve: () => getRepo(),
     },
+    issue: {
+      type: issueType,
+      resolve: () => getIssue(),
+    },
   }),
 });
 
