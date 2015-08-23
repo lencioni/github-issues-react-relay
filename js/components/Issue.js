@@ -20,7 +20,9 @@ class Issue extends React.Component {
 
         <ul>
           {this.props.issue.labels.map(label =>
-            <li>{label}</li>
+            <li key={label.id} style={{ color: `#${label.color}` }}>
+              {label.name}
+            </li>
           )}
         </ul>
       </div>
@@ -32,13 +34,15 @@ export default Relay.createContainer(Issue, {
   fragments: {
     issue: () => Relay.QL`
       fragment on Issue {
-        id,
         body,
-        labels,
+        labels {
+          id,
+          color,
+          name,
+        },
         number,
         title,
         user {
-          id,
           login,
         }
       }

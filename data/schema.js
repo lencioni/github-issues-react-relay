@@ -32,6 +32,7 @@ import {
 
 import {
   Issue,
+  Label,
   Repo,
   User,
   getIssue,
@@ -62,6 +63,8 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return repoType;
     } else if (obj instanceof Issue) {
       return issueType;
+    } else if (obj instanceof Label) {
+      return labelType;
     } else if (obj instanceof User) {
       return userType;
     } else {
@@ -111,9 +114,9 @@ var issueType = new GraphQLObjectType({
       resolve: issue => issue.user,
     },
     labels: {
-      type: new GraphQLList(GraphQLString),
-      description: 'List of labels associated with the issue',
-      resolve: issue => issue.labels.map(label => label.name),
+      type: new GraphQLList(labelType),
+      description: 'Labels associated with the issue',
+      resolve: issue => issue.labels,
     },
     state: {
       type: GraphQLString,
@@ -149,6 +152,24 @@ var issueType = new GraphQLObjectType({
   interfaces: [nodeInterface],
 });
 
+var labelType = new GraphQLObjectType({
+  name: 'Label',
+  description: 'A GitHub issue label',
+  fields: () => ({
+    id: globalIdField('Label', label => label.url),
+    name: {
+      type: GraphQLString,
+      description: "The label's name",
+      resolve: label => label.name,
+    },
+    color: {
+      type: GraphQLString,
+      description: "The label's color",
+      resolve: label => label.color,
+    },
+  }),
+  interfaces: [nodeInterface],
+});
 
 var userType = new GraphQLObjectType({
   name: 'User',
@@ -161,8 +182,8 @@ var userType = new GraphQLObjectType({
       resolve: user => user.login,
     },
   }),
+  interfaces: [nodeInterface],
 });
-
 
 const { connectionType: issueConnection } =
   connectionDefinitions({ name: 'Issue', nodeType: issueType });

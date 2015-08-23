@@ -8,8 +8,9 @@ const CLIENT_ID = '1ab301e6cff0b8da5de7';
 const CLIENT_SECRET = '74c0729c6b68ad2b0f92d439b51197f511ce6731';
 
 // Model types
-export class Repo extends Object {}
 export class Issue extends Object {}
+export class Label extends Object {}
+export class Repo extends Object {}
 export class User extends Object {}
 
 const repo = new Repo();
