@@ -34,7 +34,9 @@ class IssueSummary extends React.Component {
           <IssueByline issue={issue} />
         </div>
 
-        <IssueLabels issue={issue} />
+        <div style={{ marginBottom: '.3em' }}>
+          <IssueLabels issue={issue} />
+        </div>
 
         <div
           style={{

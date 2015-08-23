@@ -16,7 +16,9 @@ class Issue extends React.Component {
           <IssueByline issue={issue} />
         </div>
 
-        <IssueLabels issue={issue} />
+        <div>
+          <IssueLabels issue={issue} />
+        </div>
       </PageContainer>
     );
   }

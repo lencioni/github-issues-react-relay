@@ -11,7 +11,7 @@ class IssueLabels extends React.Component {
     }
 
     return (
-      <div style={{ display: 'inline-block', marginBottom: '.3em', }}>
+      <span>
         {issue.labels.map(label =>
           <span
             style={{
@@ -21,7 +21,7 @@ class IssueLabels extends React.Component {
             <Label key={label.id} label={label} />
           </span>
         )}
-      </div>
+      </span>
     );
   }
 }
