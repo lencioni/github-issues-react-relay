@@ -33,6 +33,7 @@ import {
 import {
   Issue,
   Repo,
+  User,
   getIssue,
   getIssues,
   getRepo,
@@ -61,6 +62,8 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return repoType;
     } else if (obj instanceof Issue) {
       return issueType;
+    } else if (obj instanceof User) {
+      return userType;
     } else {
       return null;
     }
@@ -102,7 +105,11 @@ var issueType = new GraphQLObjectType({
       description: 'Title of the issue',
       resolve: issue => issue.title,
     },
-    // TODO user
+    user: {
+      type: userType,
+      description: 'The creator of the issue',
+      resolve: issue => issue.user,
+    },
     labels: {
       type: new GraphQLList(GraphQLString),
       description: 'List of labels associated with the issue',
@@ -141,6 +148,21 @@ var issueType = new GraphQLObjectType({
   }),
   interfaces: [nodeInterface],
 });
+
+
+var userType = new GraphQLObjectType({
+  name: 'User',
+  description: 'A GitHub user',
+  fields: () => ({
+    id: globalIdField('User'),
+    login: {
+      type: GraphQLString,
+      description: "The user's username",
+      resolve: user => user.login,
+    },
+  }),
+});
+
 
 const { connectionType: issueConnection } =
   connectionDefinitions({ name: 'Issue', nodeType: issueType });

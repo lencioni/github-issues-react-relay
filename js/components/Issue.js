@@ -11,6 +11,10 @@ class Issue extends React.Component {
         </div>
 
         <div>
+          by {this.props.issue.user.login}
+        </div>
+
+        <div>
           {truncateString(this.props.issue.body, 140)}
         </div>
 
@@ -33,6 +37,10 @@ export default Relay.createContainer(Issue, {
         labels,
         number,
         title,
+        user {
+          id,
+          login,
+        }
       }
     `,
   },
