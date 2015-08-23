@@ -14,6 +14,7 @@ class IssueSummary extends React.Component {
         <div
           style={{
             fontWeight: 'bold',
+            marginBottom: '.2em',
           }}
           >
           {issue.title}
