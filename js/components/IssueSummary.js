@@ -47,7 +47,7 @@ class IssueSummary extends React.Component {
           {truncateString(issue.body, 140)}
         </div>
 
-        {issue.labels.count > 0 &&
+        {issue.labels.length > 0 &&
           <ul>
             {issue.labels.map(label =>
               <li key={label.id} style={{ color: `#${label.color}` }}>
