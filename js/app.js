@@ -33,7 +33,7 @@ const HomeQueries = {
 const IssueQueries = {
   issue: (Component) => Relay.QL`
     query {
-      issue {
+      node(id: $id) {
         ${Component.getFragment('issue')},
       },
     }

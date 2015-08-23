@@ -8,7 +8,15 @@ const CLIENT_ID = '1ab301e6cff0b8da5de7';
 const CLIENT_SECRET = '74c0729c6b68ad2b0f92d439b51197f511ce6731';
 
 // Model types
-export class Issue extends Object {}
+export class Issue extends Object {
+  constructor(data) {
+    super(data);
+
+    Object.keys(data).forEach(key => {
+      this[key] = data[key];
+    });
+  }
+}
 export class Label extends Object {}
 export class Repo extends Object {}
 export class User extends Object {}
@@ -20,8 +28,19 @@ repo.lastPage = undefined;
 
 let issues = [];
 
+function encodeNumberInId(issue) {
+  // We can't query GitHub for individual issues based on ID--we need the
+  // number. In order to make this work with Relay, which relies on the object's
+  // ID to wire things up, I am encoding the issue number in its ID.
+  issue.id = `${issue.id};${issue.number}`;
+  return issue;
+}
+
 function fetchIssue(number) {
-  return fetch(`https://api.github.com/repos/npm/npm/issues/${number}`);
+  return fetch(`https://api.github.com/repos/npm/npm/issues/${number}` +
+               `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`)
+    .then(result => result.json())
+    .then(json => encodeNumberInId(json));
 }
 
 function fetchIssues(page, issuesCount, count) {
@@ -53,8 +72,10 @@ function fetchIssues(page, issuesCount, count) {
           fetchIssues(page + 1, issuesCount + json.length, count)
             .catch(err => reject(err))
             .then(nextPage => json.push(...nextPage))
+            .then(() => json.forEach(encodeNumberInId))
             .then(() => resolve(json));
         } else {
+          json.forEach(encodeNumberInId);
           resolve(json);
         }
       })
@@ -97,16 +118,20 @@ export async function getIssues({ after, first }) {
   return issues;
 }
 
-export function getIssue(number) {
+export async function getIssue(idAndNumber) {
+  const number = idAndNumber.match(/;(\d+)$/)[1];
+
   const cachedIssue = issues.find(issue => issue.number === number);
 
-  if (!cachedIssue) {
+  if (cachedIssue) {
     return cachedIssue;
   }
 
   // We don't have this data yet, so let's fetch it. Since we don't know where
   // it belongs in the list, we aren't going to store it.
-  return fetchIssue(number);
+  const issueData = await fetchIssue(number);
+  const issue = new Issue(issueData);
+  return issue;
 }
 
 export function getRepo() {

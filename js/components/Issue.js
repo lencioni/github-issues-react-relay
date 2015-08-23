@@ -2,7 +2,7 @@ class Issue extends React.Component {
   render() {
     return (
       <div>
-        Issue
+        {this.props.issue.title}
       </div>
     );
   }
@@ -13,6 +13,7 @@ export default Relay.createContainer(Issue, {
     issue: () => Relay.QL`
       fragment on Issue {
         id,
+        title,
       }
     `,
   },
