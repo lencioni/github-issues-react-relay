@@ -1,5 +1,6 @@
 const Card = require('./Card');
-const Label = require('./Label');
+const IssueByline = require('./IssueByline');
+const IssueLabels = require('./IssueLabels');
 const TruncateLongLines = require('./TruncateLongLines');
 const truncateString = require('../lib/truncateString');
 const { Link } = require('react-router');
@@ -30,35 +31,10 @@ class IssueSummary extends React.Component {
             fontSize: 13,
           }}
           >
-          #{issue.number}
-          {' '}
-          opened by
-          {' '}
-          <img
-            alt=''
-            src={issue.user.avatarUrl}
-            style={{
-              height: '.85em',
-              width: '.85em',
-            }}
-          />
-          {' '}
-          {issue.user.login}
+          <IssueByline issue={issue} />
         </div>
 
-        {issue.labels.length > 0 &&
-          <div style={{ display: 'inline-block', marginBottom: '.3em', }}>
-            {issue.labels.map(label =>
-              <span
-                style={{
-                  marginRight: '.5em',
-                }}
-                >
-                <Label key={label.id} label={label} />
-              </span>
-            )}
-          </div>
-        }
+        <IssueLabels issue={issue} />
 
         <div
           style={{
@@ -81,16 +57,9 @@ export default Relay.createContainer(IssueSummary, {
       fragment on Issue {
         id,
         body,
-        labels {
-          id,
-          ${Label.getFragment('label')},
-        },
-        number,
         title,
-        user {
-          avatarUrl,
-          login,
-        }
+        ${IssueByline.getFragment('issue')},
+        ${IssueLabels.getFragment('issue')},
       }
     `,
   },
