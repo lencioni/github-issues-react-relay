@@ -1,5 +1,9 @@
 var fetch = require('node-fetch');
 
+import {
+  cursorForObjectInConnection,
+} from 'graphql-relay';
+
 const CLIENT_ID = '1ab301e6cff0b8da5de7';
 const CLIENT_SECRET = '74c0729c6b68ad2b0f92d439b51197f511ce6731';
 
@@ -55,8 +59,27 @@ function fetchIssues(page, issuesCount, count) {
   });
 }
 
-export function getIssues({ first: count }) {
+export function getIssues({ after, first }) {
   return new Promise((resolve, reject) => {
+    let count;
+    if (!after) {
+      count = first;
+    } else {
+      // Iterate backwards over the items we have looking at their cursors to
+      // find what after is pointing to.
+      for (let i = issues.length - 1; i >= 0; i--) {
+        const issue = issues[i];
+        const cursor = cursorForObjectInConnection(issues, issue);
+        if (cursor === after) {
+          count = i + 1 + first;
+        }
+      }
+    }
+
+    // always fetch at least 1 extra, so that we always know if we have another
+    // page.
+    count++;
+
     if (issues.length >= count) {
       return resolve(issues);
     }
