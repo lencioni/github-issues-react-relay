@@ -1,6 +1,6 @@
 const truncateString = require('../lib/truncateString');
 
-class Issue extends React.Component {
+class IssueSummary extends React.Component {
   render() {
     return (
       <div>
@@ -30,7 +30,7 @@ class Issue extends React.Component {
   }
 }
 
-export default Relay.createContainer(Issue, {
+export default Relay.createContainer(IssueSummary, {
   fragments: {
     issue: () => Relay.QL`
       fragment on Issue {
