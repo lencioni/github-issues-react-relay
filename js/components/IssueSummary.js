@@ -2,24 +2,28 @@ const truncateString = require('../lib/truncateString');
 
 class IssueSummary extends React.Component {
   render() {
+    const {
+      issue,
+    } = this.props;
+
     return (
       <div>
         <div>
-          #{this.props.issue.number}
+          #{issue.number}
           {' '}
-          {this.props.issue.title}
+          {issue.title}
         </div>
 
         <div>
-          by {this.props.issue.user.login}
+          by {issue.user.login}
         </div>
 
         <div>
-          {truncateString(this.props.issue.body, 140)}
+          {truncateString(issue.body, 140)}
         </div>
 
         <ul>
-          {this.props.issue.labels.map(label =>
+          {issue.labels.map(label =>
             <li key={label.id} style={{ color: `#${label.color}` }}>
               {label.name}
             </li>
