@@ -91,7 +91,7 @@ function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn
   });
 }
 
-function fetchIssues(page, issuesCount, count) {
+function fetchIssues(repo, page, issuesCount, count) {
   const url = `https://api.github.com/repos/npm/npm/issues?page=${page}` +
               `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
   return fetchPaginatedItems(
@@ -100,7 +100,7 @@ function fetchIssues(page, issuesCount, count) {
   );
 }
 
-export async function getIssues({ after, first }) {
+async function getPaginated(parent, cachedItems, fetchFn, after, first) {
   let count;
   if (!after) {
     count = first;
@@ -109,9 +109,9 @@ export async function getIssues({ after, first }) {
     // find what after is pointing to. We are iterating backwards because the
     // cursor is likely to be very close to the end because our issues array
     // contains what we have from GitHub so far.
-    for (let i = issues.length - 1; i >= 0; i--) {
-      const issue = issues[i];
-      const cursor = cursorForObjectInConnection(issues, issue);
+    for (let i = cachedItems.length - 1; i >= 0; i--) {
+      const item = cachedItems[i];
+      const cursor = cursorForObjectInConnection(cachedItems, item);
       if (cursor === after) {
         count = i + 1 + first;
       }
@@ -122,18 +122,18 @@ export async function getIssues({ after, first }) {
   // another page.
   count++;
 
-  if (issues.length >= count) {
-    return issues;
+  if (cachedItems.length >= count) {
+    return cachedItems;
   }
 
   // We don't have enough issues yet, so we need to fetch more pages until we
   // have enough.
-  const nextPage = repo.itemsPerPage ?
-    Math.floor(issues.length / repo.itemsPerPage) + 1 : 1;
+  const nextPage = parent.itemsPerPage ?
+    Math.floor(cachedItems.length / parent.itemsPerPage) + 1 : 1;
 
-  const nextIssues = await fetchIssues(nextPage, issues.length, count);
-  issues.push(...nextIssues);
-  return issues;
+  const nextItems = await fetchFn(repo, nextPage, cachedItems.length, count);
+  cachedItems.push(...nextItems);
+  return cachedItems;
 }
 
 export async function getIssue(idAndNumber) {
