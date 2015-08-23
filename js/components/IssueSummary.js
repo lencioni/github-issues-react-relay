@@ -1,5 +1,6 @@
 const Card = require('./Card');
 const Label = require('./Label');
+const TruncateLongLines = require('./TruncateLongLines');
 const truncateString = require('../lib/truncateString');
 
 class IssueSummary extends React.Component {
@@ -59,7 +60,9 @@ class IssueSummary extends React.Component {
             fontSize: 13,
           }}
           >
-          {truncateString(issue.body, 140)}
+          <TruncateLongLines>
+            {truncateString(issue.body, 140)}
+          </TruncateLongLines>
         </div>
       </Card>
     );
