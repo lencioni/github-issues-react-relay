@@ -138,7 +138,7 @@ async function getPaginated(parent, cachedItems, fetchFn, after, first) {
   const nextPage = parent.itemsPerPage ?
     Math.floor(cachedItems.length / parent.itemsPerPage) + 1 : 1;
 
-  const nextItems = await fetchFn(repo, nextPage, cachedItems.length, count);
+  const nextItems = await fetchFn(parent, nextPage, cachedItems.length, count);
   cachedItems.push(...nextItems);
   return cachedItems;
 }
