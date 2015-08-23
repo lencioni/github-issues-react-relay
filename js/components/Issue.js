@@ -1,9 +1,11 @@
+const PageContainer = require('./PageContainer');
+
 class Issue extends React.Component {
   render() {
     return (
-      <div>
+      <PageContainer>
         {this.props.issue.title}
-      </div>
+      </PageContainer>
     );
   }
 }

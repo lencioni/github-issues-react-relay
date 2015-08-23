@@ -1,4 +1,5 @@
 const IssueSummary = require('./IssueSummary');
+const PageContainer = require('./PageContainer');
 const Waypoint = require('react-waypoint');
 
 const ISSUES_PER_PAGE = 25;
@@ -17,13 +18,7 @@ class Home extends React.Component {
     const transaction = transactions ? transactions[0] : null;
 
     return (
-      <div
-        style={{
-          margin: '0 auto',
-          maxWidth: 700,
-          padding: '0 20px',
-        }}
-        >
+      <PageContainer>
         <h1>{this.props.repo.name} Issues</h1>
         {this.props.repo.issues.edges.map(issue =>
           <IssueSummary issue={issue.node} key={issue.node.id} />
@@ -33,7 +28,7 @@ class Home extends React.Component {
           // to try to load the next page.
           <Waypoint onEnter={() => this.addPage()} threshold={1} />
         }
-      </div>
+      </PageContainer>
     );
   }
 }
