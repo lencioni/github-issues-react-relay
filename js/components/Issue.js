@@ -1,8 +1,9 @@
+const Card = require('./Card');
 const IssueByline = require('./IssueByline');
 const IssueLabels = require('./IssueLabels');
+const Markdown = require('./Markdown');
 const PageContainer = require('./PageContainer');
 const TruncateLongLines = require('./TruncateLongLines');
-const marked = require('marked');
 const { Link } = require('react-router');
 
 class Issue extends React.Component {
@@ -31,7 +32,11 @@ class Issue extends React.Component {
           <IssueLabels issue={issue} />
         </div>
 
-        <div dangerouslySetInnerHTML={{ __html: marked(issue.body) }} />
+        <Card>
+          <TruncateLongLines>
+            <Markdown source={issue.body} />
+          </TruncateLongLines>
+        </Card>
       </PageContainer>
     );
   }
