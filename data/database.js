@@ -66,7 +66,9 @@ export function getIssues({ after, first }) {
       count = first;
     } else {
       // Iterate backwards over the items we have looking at their cursors to
-      // find what after is pointing to.
+      // find what after is pointing to. We are iterating backwards because the
+      // cursor is likely to be very close to the end because our issues array
+      // contains what we have from GitHub so far.
       for (let i = issues.length - 1; i >= 0; i--) {
         const issue = issues[i];
         const cursor = cursorForObjectInConnection(issues, issue);
@@ -76,8 +78,8 @@ export function getIssues({ after, first }) {
       }
     }
 
-    // always fetch at least 1 extra, so that we always know if we have another
-    // page.
+    // Always fetch at least 1 extra, so that Relay always knows if we have
+    // another page.
     count++;
 
     if (issues.length >= count) {
