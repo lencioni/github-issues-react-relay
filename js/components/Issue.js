@@ -2,6 +2,7 @@ const IssueByline = require('./IssueByline');
 const IssueLabels = require('./IssueLabels');
 const PageContainer = require('./PageContainer');
 const TruncateLongLines = require('./TruncateLongLines');
+const marked = require('marked');
 const { Link } = require('react-router');
 
 class Issue extends React.Component {
@@ -29,6 +30,8 @@ class Issue extends React.Component {
         <div>
           <IssueLabels issue={issue} />
         </div>
+
+        <div dangerouslySetInnerHTML={{ __html: marked(issue.body) }} />
       </PageContainer>
     );
   }
@@ -45,6 +48,7 @@ export default Relay.createContainer(Issue, {
       fragment on Issue {
         id,
         title,
+        body,
         ${IssueByline.getFragment('issue')},
         ${IssueLabels.getFragment('issue')},
       }

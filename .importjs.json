@@ -9,6 +9,7 @@
   ],
   "aliases": {
     "fetch": "node-fetch",
+    "marked": "marked",
     "ReactRouter": {
       "path": "react-router",
       "destructure": ["Link", "Router", "Route"]
