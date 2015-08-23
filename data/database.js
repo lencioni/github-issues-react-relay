@@ -23,7 +23,7 @@ export class User extends Object {}
 
 const repo = new Repo();
 repo.id = 'npm/npm';
-repo.issuesPerPage = undefined;
+repo.itemsPerPage = undefined;
 repo.lastPage = undefined;
 
 let issues = [];
@@ -43,19 +43,18 @@ function fetchIssue(number) {
     .then(json => encodeNumberInId(json));
 }
 
-function fetchIssues(page, issuesCount, count) {
+function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn) {
   return new Promise((resolve, reject) => {
-    fetch(`https://api.github.com/repos/npm/npm/issues?page=${page}` +
-          `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`)
+    fetch(url)
       .catch(err => reject(err))
       .then(result => {
-        if (repo.lastPage === undefined) {
+        if (parent.lastPage === undefined) {
           // Find out what the last page is. GitHub encodes this information
           // into a link header.
           const links = result.headers.get('link').split(',');
           const lastPageLink = links.find(link => link.includes('rel="last"'));
           if (lastPageLink) {
-            repo.lastPage = parseInt(lastPageLink.match(/page=(\d+)/)[1], 10);
+            parent.lastPage = parseInt(lastPageLink.match(/page=(\d+)/)[1], 10);
           }
         }
 
@@ -64,22 +63,41 @@ function fetchIssues(page, issuesCount, count) {
         return result.json();
       })
       .then(json => {
-        if (repo.issuesPerPage === undefined) {
-          repo.issuesPerPage = json.length;
+        if (parent.itemsPerPage === undefined) {
+          parent.itemsPerPage = json.length;
         }
 
-        if (page < repo.lastPage && issuesCount + json.length < count) {
-          fetchIssues(page + 1, issuesCount + json.length, count)
+        if (page < parent.lastPage && itemsCount + json.length < count) {
+          fetchIssues(page + 1, itemsCount + json.length, count)
             .catch(err => reject(err))
-            .then(nextPage => json.push(...nextPage))
-            .then(() => json.forEach(encodeNumberInId))
-            .then(() => resolve(json));
+            .then(nextPage => {
+              json.push(...nextPage)
+              return json;
+            })
+            .then(json => {
+              if (processJsonFn) {
+                processJsonFn(json)
+              }
+              return json;
+            })
+            .then(json => resolve(json));
         } else {
-          json.forEach(encodeNumberInId);
+          if (processJsonFn) {
+            processJsonFn(json)
+          }
           resolve(json);
         }
       })
   });
+}
+
+function fetchIssues(page, issuesCount, count) {
+  const url = `https://api.github.com/repos/npm/npm/issues?page=${page}` +
+              `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
+  return fetchPaginatedItems(
+    url, repo, page, issuesCount, count,
+    json => json.forEach(encodeNumberInId)
+  );
 }
 
 export async function getIssues({ after, first }) {
@@ -110,8 +128,8 @@ export async function getIssues({ after, first }) {
 
   // We don't have enough issues yet, so we need to fetch more pages until we
   // have enough.
-  const nextPage = repo.issuesPerPage ?
-    Math.floor(issues.length / repo.issuesPerPage) + 1 : 1;
+  const nextPage = repo.itemsPerPage ?
+    Math.floor(issues.length / repo.itemsPerPage) + 1 : 1;
 
   const nextIssues = await fetchIssues(nextPage, issues.length, count);
   issues.push(...nextIssues);
