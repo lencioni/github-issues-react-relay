@@ -1,7 +1,7 @@
 import {Router, Route} from 'react-router';
 import BrowserHistory from 'react-router/lib/BrowserHistory';
 
-import App from './components/App';
+import Home from './components/Home';
 
 function createRelayContainer(Component, props) {
   if (Relay.isContainer(Component)) {
@@ -35,7 +35,7 @@ React.render(
       <Route
         name='home'
         path='/'
-        component={App}
+        component={Home}
         queries={HomeQueries}
       />
     </Route>

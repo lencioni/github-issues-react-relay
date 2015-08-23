@@ -3,7 +3,7 @@ const Waypoint = require('react-waypoint');
 
 const ISSUES_PER_PAGE = 25;
 
-class App extends React.Component {
+class Home extends React.Component {
   addPage() {
     const newCount = this.props.relay.variables.count + ISSUES_PER_PAGE;
     this.props.relay.setVariables({
@@ -38,7 +38,7 @@ class App extends React.Component {
   }
 }
 
-export default Relay.createContainer(App, {
+export default Relay.createContainer(Home, {
   initialVariables: {
     count: ISSUES_PER_PAGE,
   },
