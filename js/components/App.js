@@ -6,7 +6,6 @@ const ISSUES_PER_PAGE = 25;
 class App extends React.Component {
   addPage() {
     const newCount = this.props.relay.variables.count + ISSUES_PER_PAGE;
-    console.log('bumping count', newCount);
     this.props.relay.setVariables({
       count: newCount,
     });
