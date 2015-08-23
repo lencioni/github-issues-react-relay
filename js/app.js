@@ -31,6 +31,13 @@ const HomeQueries = {
 };
 
 const IssueQueries = {
+  repo: (Component) => Relay.QL`
+    query {
+      repo {
+        ${Component.getFragment('repo')},
+      },
+    }
+  `,
   issue: (Component) => Relay.QL`
     query {
       node(id: $id) {

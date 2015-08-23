@@ -2,6 +2,7 @@ const IssueByline = require('./IssueByline');
 const IssueLabels = require('./IssueLabels');
 const PageContainer = require('./PageContainer');
 const TruncateLongLines = require('./TruncateLongLines');
+const { Link } = require('react-router');
 
 class Issue extends React.Component {
   render() {
@@ -11,6 +12,10 @@ class Issue extends React.Component {
 
     return (
       <PageContainer>
+        <Link to='/'>
+          &larr; Back to {this.props.repo.name}
+        </Link>
+
         <h1>
           <TruncateLongLines>
             {issue.title}
@@ -31,6 +36,11 @@ class Issue extends React.Component {
 
 export default Relay.createContainer(Issue, {
   fragments: {
+    repo: () => Relay.QL`
+      fragment on Repo {
+        name,
+      },
+    `,
     issue: () => Relay.QL`
       fragment on Issue {
         id,
