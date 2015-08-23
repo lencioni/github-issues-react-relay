@@ -51,10 +51,17 @@ function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn
         if (parent.lastPage === undefined) {
           // Find out what the last page is. GitHub encodes this information
           // into a link header.
-          const links = result.headers.get('link').split(',');
-          const lastPageLink = links.find(link => link.includes('rel="last"'));
-          if (lastPageLink) {
-            parent.lastPage = parseInt(lastPageLink.match(/page=(\d+)/)[1], 10);
+          const linkHeader = result.headers.get('link');
+          if (linkHeader) {
+            const links = linkHeader.split(',');
+            const lastPageLink = links.find(link => link.includes('rel="last"'));
+            if (lastPageLink) {
+              parent.lastPage = parseInt(lastPageLink.match(/page=(\d+)/)[1], 10);
+            } else {
+              parent.lastPage = page;
+            }
+          } else {
+            parent.lastPage = page;
           }
         }
 
