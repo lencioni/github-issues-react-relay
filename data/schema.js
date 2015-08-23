@@ -81,7 +81,7 @@ var repoType = new GraphQLObjectType({
       description: 'Issues that people have opened',
       args: connectionArgs,
       resolve: (repo, args) => connectionFromPromisedArray(
-        getIssues(args.first), args),
+        getIssues(args), args),
     },
   }),
   interfaces: [nodeInterface],

@@ -1,8 +1,11 @@
 var fetch = require('node-fetch');
 
+const CLIENT_ID = '1ab301e6cff0b8da5de7';
+const CLIENT_SECRET = '74c0729c6b68ad2b0f92d439b51197f511ce6731';
+
 // Model types
-class Repo extends Object {}
-class Issue extends Object {}
+export class Repo extends Object {}
+export class Issue extends Object {}
 
 const repo = new Repo();
 repo.id = 'npm/npm';
@@ -17,7 +20,8 @@ function fetchIssue(number) {
 
 function fetchIssues(page, issuesCount, count) {
   return new Promise((resolve, reject) => {
-    fetch(`https://api.github.com/repos/npm/npm/issues?page=${page}`)
+    fetch(`https://api.github.com/repos/npm/npm/issues?page=${page}` +
+          `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`)
       .catch(err => reject(err))
       .then(result => {
         if (repo.lastPage === undefined) {
@@ -51,11 +55,10 @@ function fetchIssues(page, issuesCount, count) {
   });
 }
 
-export function getIssues(count) {
-
+export function getIssues({ first: count }) {
   return new Promise((resolve, reject) => {
     if (issues.length >= count) {
-      return resolve(issues.slice(0, count));
+      return resolve(issues);
     }
 
     // We don't have enough issues yet, so we need to fetch more pages until we
@@ -66,7 +69,7 @@ export function getIssues(count) {
     fetchIssues(nextPage, issues.length, count)
       .catch(err => reject(err))
       .then(nextIssues => issues.push(...nextIssues))
-      .then(() => resolve(issues.slice(0, count)));
+      .then(() => resolve(issues));
   });
 }
 
