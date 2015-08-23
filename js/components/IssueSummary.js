@@ -17,7 +17,9 @@ class IssueSummary extends React.Component {
             marginBottom: '.2em',
           }}
           >
-          {issue.title}
+          <TruncateLongLines>
+            {issue.title}
+          </TruncateLongLines>
         </div>
 
         <div
