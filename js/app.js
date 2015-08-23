@@ -6,7 +6,7 @@ React.render(
     Component={App}
     route={new AppHomeRoute()}
     renderLoading={() =>
-      <div>Loading...</div>
+      <div>Loading…</div>
     }
   />,
   document.getElementById('root')
