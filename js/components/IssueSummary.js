@@ -1,4 +1,5 @@
 const Card = require('./Card');
+const Label = require('./Label');
 const truncateString = require('../lib/truncateString');
 
 class IssueSummary extends React.Component {
@@ -38,6 +39,20 @@ class IssueSummary extends React.Component {
           {issue.user.login}
         </div>
 
+        {issue.labels.length > 0 &&
+          <div style={{ display: 'inline-block', marginBottom: '.3em', }}>
+            {issue.labels.map(label =>
+              <span
+                style={{
+                  marginRight: '.5em',
+                }}
+                >
+                <Label key={label.id} label={label} />
+              </span>
+            )}
+          </div>
+        }
+
         <div
           style={{
             color: '#888',
@@ -46,16 +61,6 @@ class IssueSummary extends React.Component {
           >
           {truncateString(issue.body, 140)}
         </div>
-
-        {issue.labels.length > 0 &&
-          <ul>
-            {issue.labels.map(label =>
-              <li key={label.id} style={{ color: `#${label.color}` }}>
-                {label.name}
-              </li>
-            )}
-          </ul>
-        }
       </Card>
     );
   }
@@ -68,8 +73,7 @@ export default Relay.createContainer(IssueSummary, {
         body,
         labels {
           id,
-          color,
-          name,
+          ${Label.getFragment('label')},
         },
         number,
         title,
