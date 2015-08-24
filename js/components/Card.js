@@ -8,6 +8,7 @@ export default class Card extends React.Component {
           borderRadius: 3,
           margin: '10px 0',
           padding: 20,
+          width: '100%',
         }}
         >
         {this.props.children}

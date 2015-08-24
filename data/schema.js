@@ -32,11 +32,13 @@ import {
 
 import {
   Issue,
+  Comment,
   Label,
   Repo,
   User,
   getIssue,
   getIssues,
+  getComments,
   getRepo,
 } from './database';
 
@@ -63,6 +65,8 @@ var {nodeInterface, nodeField} = nodeDefinitions(
       return repoType;
     } else if (obj instanceof Issue) {
       return issueType;
+    } else if (obj instanceof Comment) {
+      return commentType;
     } else if (obj instanceof Label) {
       return labelType;
     } else if (obj instanceof User) {
@@ -154,6 +158,13 @@ var issueType = new GraphQLObjectType({
       description: 'Time the issue was closed',
       resolve: issue => issue.closed_at,
     },
+    comments: {
+      type: commentConnection,
+      description: 'Comments on issues',
+      args: connectionArgs,
+      resolve: (issue, args) => connectionFromPromisedArray(
+        getComments(issue, args), args),
+    },
   }),
   interfaces: [nodeInterface],
 });
@@ -196,8 +207,29 @@ var userType = new GraphQLObjectType({
   interfaces: [nodeInterface],
 });
 
+var commentType = new GraphQLObjectType({
+  name: 'Comment',
+  description: 'A GitHub comment',
+  fields: () => ({
+    id: globalIdField('Comment'),
+    body: {
+      type: GraphQLString,
+      description: 'The body of the comment',
+      resolve: comment => comment.body,
+    },
+    user: {
+      type: userType,
+      description: 'The creator of the issue',
+      resolve: issue => issue.user,
+    },
+  }),
+  interfaces: [nodeInterface],
+});
+
 const { connectionType: issueConnection } =
   connectionDefinitions({ name: 'Issue', nodeType: issueType });
+const { connectionType: commentConnection } =
+  connectionDefinitions({ name: 'Comment', nodeType: commentType });
 
 /**
  * This is the type that will be the root of our query,

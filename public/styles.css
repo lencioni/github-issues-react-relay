@@ -18,7 +18,29 @@ p {
   margin: 0 0 1em;
 }
 
+/* Utility classes for things that aren't possible with inline styles */
+.display--flex {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex
+}
+
 /* Components that can't just use inline styles */
 .Markdown > *:last-child {
   margin-bottom: 0;
+}
+
+.Markdown > pre {
+  background: rgba(0, 0, 0, .05);
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, .05);
+  font-size: smaller;
+  max-width: 100%;
+  overflow: auto;
+  padding: 5px;
+}
+
+.Markdown > pre > code {
+  display: inline-block;
 }

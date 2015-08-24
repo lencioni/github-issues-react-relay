@@ -1,12 +1,23 @@
 const Card = require('./Card');
+const Comment = require('./Comment');
 const IssueByline = require('./IssueByline');
 const IssueLabels = require('./IssueLabels');
 const Markdown = require('./Markdown');
 const PageContainer = require('./PageContainer');
 const TruncateLongLines = require('./TruncateLongLines');
+const Waypoint = require('react-waypoint');
 const { Link } = require('react-router');
 
+const COMMENTS_PER_PAGE = 25;
+
 class Issue extends React.Component {
+  addPage() {
+    const newCount = this.props.relay.variables.count + COMMENTS_PER_PAGE;
+    this.props.relay.setVariables({
+      count: newCount,
+    });
+  }
+
   render() {
     const {
       issue,
@@ -33,16 +44,24 @@ class Issue extends React.Component {
         </div>
 
         <Card>
-          <TruncateLongLines>
-            <Markdown source={issue.body} />
-          </TruncateLongLines>
+          <Markdown source={issue.body} />
         </Card>
+
+        {issue.comments.edges.map(comment =>
+          <Comment comment={comment.node} />
+        )}
+
+        <Waypoint onEnter={() => this.addPage()} threshold={1} />
       </PageContainer>
     );
   }
 }
 
 export default Relay.createContainer(Issue, {
+  initialVariables: {
+    count: COMMENTS_PER_PAGE,
+  },
+
   fragments: {
     repo: () => Relay.QL`
       fragment on Repo {
@@ -56,6 +75,13 @@ export default Relay.createContainer(Issue, {
         body,
         ${IssueByline.getFragment('issue')},
         ${IssueLabels.getFragment('issue')},
+        comments(first: $count) {
+          edges {
+            node {
+              ${Comment.getFragment('comment')},
+            },
+          },
+        },
       }
     `,
   },

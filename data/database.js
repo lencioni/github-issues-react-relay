@@ -17,6 +17,7 @@ export class Issue extends Object {
     });
   }
 }
+export class Comment extends Object {}
 export class Label extends Object {}
 export class Repo extends Object {}
 export class User extends Object {}
@@ -111,6 +112,12 @@ function fetchIssues(repo, page, issuesCount, count) {
   );
 }
 
+function fetchComments(issue, page, commentsCount, count) {
+  const url = `https://api.github.com/repos/npm/npm/issues/${issue.number}/comments` +
+              `?page=${page}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
+  return fetchPaginatedItems(url, issue, page, commentsCount, count);
+}
+
 async function getPaginated(parent, cachedItems, fetchFn, after, first) {
   let count;
   if (!after) {
@@ -147,8 +154,21 @@ async function getPaginated(parent, cachedItems, fetchFn, after, first) {
   return cachedItems;
 }
 
+export function getIssues({ after, first }) {
+  return getPaginated(repo, issues, fetchIssues, after, first);
+}
+
+export async function getComments(issue, { after, first }) {
+  if (!issue.comment_objects) {
+    issue.comment_objects = [];
+  }
+  const pag = await getPaginated(
+    issue, issue.comment_objects, fetchComments, after, first);
+  return pag;
+}
+
 export async function getIssue(idAndNumber) {
-  const number = idAndNumber.match(/;(\d+)$/)[1];
+  const number = extractNumberFromIdAndNumber(idAndNumber);
 
   const cachedIssue = issues.find(issue => issue.number === number);
 

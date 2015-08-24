@@ -13,9 +13,9 @@ class Home extends React.Component {
   }
 
   render() {
-    const repo = this.props.repo;
-    const transactions = this.props.relay.getPendingTransactions(repo);
-    const transaction = transactions ? transactions[0] : null;
+    const {
+      repo,
+    } = this.props;
 
     return (
       <PageContainer>
@@ -23,11 +23,8 @@ class Home extends React.Component {
         {this.props.repo.issues.edges.map(issue =>
           <IssueSummary issue={issue.node} key={issue.node.id} />
         )}
-        {!transaction &&
-          // We aren't waiting on more issues, so we want to render the waypoint
-          // to try to load the next page.
-          <Waypoint onEnter={() => this.addPage()} threshold={1} />
-        }
+
+        <Waypoint onEnter={() => this.addPage()} threshold={1} />
       </PageContainer>
     );
   }
