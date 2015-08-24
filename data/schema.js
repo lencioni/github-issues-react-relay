@@ -48,9 +48,9 @@ import {
  * The first method defines the way we resolve an ID to its object.
  * The second defines the way we resolve an object to its GraphQL type.
  */
-var {nodeInterface, nodeField} = nodeDefinitions(
+const {nodeInterface, nodeField} = nodeDefinitions(
   (globalId) => {
-    var {type, id} = fromGlobalId(globalId);
+    const {type, id} = fromGlobalId(globalId);
     if (type === 'Repo') {
       return getRepo(id);
     } else if (type === 'Issue') {
@@ -81,7 +81,7 @@ var {nodeInterface, nodeField} = nodeDefinitions(
  * Define your own types here
  */
 
-var repoType = new GraphQLObjectType({
+const repoType = new GraphQLObjectType({
   name: 'Repo',
   description: 'A GitHub repo',
   fields: () => ({
@@ -103,7 +103,7 @@ var repoType = new GraphQLObjectType({
   interfaces: [nodeInterface],
 });
 
-var issueType = new GraphQLObjectType({
+const issueType = new GraphQLObjectType({
   name: 'Issue',
   description: 'A GitHub issue',
   fields: () => ({
@@ -169,7 +169,7 @@ var issueType = new GraphQLObjectType({
   interfaces: [nodeInterface],
 });
 
-var labelType = new GraphQLObjectType({
+const labelType = new GraphQLObjectType({
   name: 'Label',
   description: 'A GitHub issue label',
   fields: () => ({
@@ -188,7 +188,7 @@ var labelType = new GraphQLObjectType({
   interfaces: [nodeInterface],
 });
 
-var userType = new GraphQLObjectType({
+const userType = new GraphQLObjectType({
   name: 'User',
   description: 'A GitHub user',
   fields: () => ({
@@ -207,7 +207,7 @@ var userType = new GraphQLObjectType({
   interfaces: [nodeInterface],
 });
 
-var commentType = new GraphQLObjectType({
+const commentType = new GraphQLObjectType({
   name: 'Comment',
   description: 'A GitHub comment',
   fields: () => ({
@@ -235,7 +235,7 @@ const { connectionType: commentConnection } =
  * This is the type that will be the root of our query,
  * and the entry point into our schema.
  */
-var queryType = new GraphQLObjectType({
+const queryType = new GraphQLObjectType({
   name: 'Query',
   fields: () => ({
     node: nodeField,
@@ -254,7 +254,7 @@ var queryType = new GraphQLObjectType({
  * This is the type that will be the root of our mutations,
  * and the entry point into performing writes in our schema.
  */
-var mutationType = new GraphQLObjectType({
+const mutationType = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
     // Add your own mutations here
@@ -265,7 +265,7 @@ var mutationType = new GraphQLObjectType({
  * Finally, we construct our schema (whose starting query type is the query
  * type we defined above) and export it.
  */
-export var Schema = new GraphQLSchema({
+export const Schema = new GraphQLSchema({
   query: queryType,
   mutation: mutationType
 });
