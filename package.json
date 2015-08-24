@@ -1,9 +1,7 @@
 {
-  "name": "relay-starter-kit",
+  "name": "github-issues",
   "private": true,
-  "description": "A quick way to get up and running with Relay",
-  "repository": "facebook/relay-starter-kit",
-  "version": "0.1.0",
+  "description": "GitHub issues viewer",
   "scripts": {
     "start": "babel-node ./server.js",
     "update-schema": "babel-node ./scripts/updateSchema.js"
