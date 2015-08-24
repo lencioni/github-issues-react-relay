@@ -36,9 +36,13 @@ function encodeNumberInId(issue) {
   return issue;
 }
 
+function extractNumberFromIdAndNumber(idAndNumber) {
+  return idAndNumber.match(/;(\d+)$/)[1];
+}
+
 function fetchIssue(number) {
   return fetch(`https://api.github.com/repos/npm/npm/issues/${number}` +
-               `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`)
+               `?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`)
     .then(result => result.json())
     .then(json => encodeNumberInId(json));
 }
