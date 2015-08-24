@@ -1,4 +1,4 @@
-var fetch = require('node-fetch');
+const fetch = require('node-fetch');
 
 import {
   cursorForObjectInConnection,
@@ -29,18 +29,30 @@ repo.lastPage = undefined;
 
 let issues = [];
 
+/**
+ * We can't query GitHub for individual issues based on ID--we need the
+ * number. In order to make this work with Relay, which relies on the object's
+ * ID to wire things up, I am encoding the issue number in its ID.
+ * @param {Issue} issue
+ * @return {Issue}
+ */
 function encodeNumberInId(issue) {
-  // We can't query GitHub for individual issues based on ID--we need the
-  // number. In order to make this work with Relay, which relies on the object's
-  // ID to wire things up, I am encoding the issue number in its ID.
   issue.id = `${issue.id};${issue.number}`;
   return issue;
 }
 
+/**
+ * @param {String} idAndNumber encoded GitHub issue ID and number pair
+ * @return {String} GitHub issue number
+ */
 function extractNumberFromIdAndNumber(idAndNumber) {
   return idAndNumber.match(/;(\d+)$/)[1];
 }
 
+/**
+ * @param {Number} number GitHub issue number
+ * @return {Promise} Resolves to an object that contains the issue data
+ */
 function fetchIssue(number) {
   return fetch(`https://api.github.com/repos/npm/npm/issues/${number}` +
                `?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`)
@@ -48,6 +60,17 @@ function fetchIssue(number) {
     .then(json => encodeNumberInId(json));
 }
 
+/**
+ * @param {String} url URL to fetch paginated items from
+ * @param {Object} parent Object that owns the items that we are fetching
+ * @param {Number} page Page number that we will be asking GitHub for
+ * @param {Number} itemsCount Number of items that we already have
+ * @param {Number} count Number of items that we want to fetch
+ * @param {Function} processJsonFn Optional function that we can use to do extra
+ *   processing of the JSON that is returned by GitHub's API
+ * @return {Promise} Resolves to an array of objects that contain the data we
+ *   fetched.
+ */
 function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn) {
   return new Promise((resolve, reject) => {
     fetch(url)
@@ -103,6 +126,13 @@ function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn
   });
 }
 
+/**
+ * @param {Repo} repo Repo that these issues belong to
+ * @param {Number} page Page number that we will be asking GitHub for
+ * @param {Number} issuesCount Number of issues that we already have
+ * @param {Number} count Number of issues that we want to have
+ * @return {Issue[]}
+ */
 function fetchIssues(repo, page, issuesCount, count) {
   const url = `https://api.github.com/repos/npm/npm/issues?page=${page}` +
               `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
@@ -112,13 +142,28 @@ function fetchIssues(repo, page, issuesCount, count) {
   );
 }
 
+/**
+ * @param {Issue} issue Issue that these comments belong to
+ * @param {Number} page Page number that we will be asking GitHub for
+ * @param {Number} commentsCount Number of comments that we already have
+ * @param {Number} count Number of comments that we want to have
+ * @return {Comment[]}
+ */
 function fetchComments(issue, page, commentsCount, count) {
   const url = `https://api.github.com/repos/npm/npm/issues/${issue.number}/comments` +
               `?page=${page}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
   return fetchPaginatedItems(url, issue, page, commentsCount, count);
 }
 
-async function getPaginated(parent, cachedItems, fetchFn, after, first) {
+/**
+ * @param {Object} parent The object that owns the paginated items
+ * @param {Object[]} cachedItems Array of the items that we've already fetched
+ * @param {Function} fetchFn Function that will fetch the paginated items
+ * @param {String} after Relay cursor
+ * @param {Number} first Number of items to get
+ * @return {Object[]}
+ */
+async function getPaginatedItems(parent, cachedItems, fetchFn, after, first) {
   let count;
   if (!after) {
     count = first;
@@ -154,10 +199,20 @@ async function getPaginated(parent, cachedItems, fetchFn, after, first) {
   return cachedItems;
 }
 
+/**
+ * @param {String} after Relay cursor
+ * @param {Number} first The number of issues to fetch
+ * @return {Issue[]}
+ */
 export function getIssues({ after, first }) {
-  return getPaginated(repo, issues, fetchIssues, after, first);
+  return getPaginatedItems(repo, issues, fetchIssues, after, first);
 }
 
+/**
+ * @param {Issue} issue The issue that owns the comments we want to get
+ * @param {String} after Relay cursor
+ * @param {Number} first The number of comments to fetch
+ */
 export async function getComments(issue, { after, first }) {
   if (!issue.comment_objects) {
     issue.comment_objects = [];
@@ -169,10 +224,14 @@ export async function getComments(issue, { after, first }) {
     return issue.comment_objects;
   }
 
-  return await getPaginated(
+  return await getPaginatedItems(
     issue, issue.comment_objects, fetchComments, after, first);
 }
 
+/**
+ * @param {String} idAndNumber encoded ID and number pair (e.g. '123;4567')
+ * @return {Issue}
+ */
 export async function getIssue(idAndNumber) {
   const number = extractNumberFromIdAndNumber(idAndNumber);
 
@@ -189,6 +248,9 @@ export async function getIssue(idAndNumber) {
   return issue;
 }
 
+/**
+ * @return {Repo}
+ */
 export function getRepo() {
   return repo;
 }
