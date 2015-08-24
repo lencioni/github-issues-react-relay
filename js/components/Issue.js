@@ -36,6 +36,20 @@ class Issue extends React.Component {
         </h1>
 
         <div>
+          <span
+            style={{
+              backgroundColor: issue.state === 'open' ? '#0a0' : '#a00',
+              borderRadius: 3,
+              display: 'inline-block',
+              color: '#fff',
+              fontWeight: 500,
+              padding: '4px 8px',
+            }}
+            >
+            {issue.state[0].toUpperCase()}
+            {issue.state.substr(1)}
+          </span>
+          {' '}
           <IssueByline issue={issue} />
         </div>
 
@@ -73,6 +87,7 @@ export default Relay.createContainer(Issue, {
         id,
         title,
         body,
+        state,
         ${IssueByline.getFragment('issue')},
         ${IssueLabels.getFragment('issue')},
         comments(first: $count) {
