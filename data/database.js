@@ -162,9 +162,15 @@ export async function getComments(issue, { after, first }) {
   if (!issue.comment_objects) {
     issue.comment_objects = [];
   }
-  const pag = await getPaginated(
+
+  if (!issue.comments) {
+    // issue.comments is the count of comments. If there aren't any, no need to
+    // fetch.
+    return issue.comment_objects;
+  }
+
+  return await getPaginated(
     issue, issue.comment_objects, fetchComments, after, first);
-  return pag;
 }
 
 export async function getIssue(idAndNumber) {
