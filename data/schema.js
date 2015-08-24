@@ -1,12 +1,3 @@
-/**
- *  Copyright (c) 2015, Facebook, Inc.
- *  All rights reserved.
- *
- *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant
- *  of patent rights can be found in the PATENTS file in the same directory.
- */
-
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -78,7 +69,7 @@ const {nodeInterface, nodeField} = nodeDefinitions(
 );
 
 /**
- * Define your own types here
+ * Object types
  */
 
 const repoType = new GraphQLObjectType({
@@ -226,6 +217,10 @@ const commentType = new GraphQLObjectType({
   interfaces: [nodeInterface],
 });
 
+/**
+ * Connections
+ */
+
 const { connectionType: issueConnection } =
   connectionDefinitions({ name: 'Issue', nodeType: issueType });
 const { connectionType: commentConnection } =
@@ -251,21 +246,9 @@ const queryType = new GraphQLObjectType({
 });
 
 /**
- * This is the type that will be the root of our mutations,
- * and the entry point into performing writes in our schema.
- */
-const mutationType = new GraphQLObjectType({
-  name: 'Mutation',
-  fields: () => ({
-    // Add your own mutations here
-  })
-});
-
-/**
  * Finally, we construct our schema (whose starting query type is the query
  * type we defined above) and export it.
  */
 export const Schema = new GraphQLSchema({
   query: queryType,
-  mutation: mutationType
 });
