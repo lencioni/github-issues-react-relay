@@ -30,18 +30,6 @@ repo.lastPage = undefined;
 let issues = [];
 
 /**
- * We can't query GitHub for individual issues based on ID--we need the
- * number. In order to make this work with Relay, which relies on the object's
- * ID to wire things up, I am encoding the issue number in its ID.
- * @param {Issue} issue
- * @return {Issue}
- */
-function encodeNumberInId(issue) {
-  issue.id = `${issue.id};${issue.number}`;
-  return issue;
-}
-
-/**
  * @param {String} idAndNumber encoded GitHub issue ID and number pair
  * @return {String} GitHub issue number
  */
@@ -56,8 +44,7 @@ function extractNumberFromIdAndNumber(idAndNumber) {
 function fetchIssue(number) {
   return fetch(`https://api.github.com/repos/npm/npm/issues/${number}` +
                `?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`)
-    .then(result => result.json())
-    .then(json => encodeNumberInId(json));
+    .then(result => result.json());
 }
 
 /**
@@ -66,12 +53,10 @@ function fetchIssue(number) {
  * @param {Number} page Page number that we will be asking GitHub for
  * @param {Number} itemsCount Number of items that we already have
  * @param {Number} count Number of items that we want to fetch
- * @param {Function} processJsonFn Optional function that we can use to do extra
- *   processing of the JSON that is returned by GitHub's API
  * @return {Promise} Resolves to an array of objects that contain the data we
  *   fetched.
  */
-function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn) {
+function fetchPaginatedItems(url, parent, page, itemsCount, count) {
   return new Promise((resolve, reject) => {
     fetch(url)
       .catch(err => reject(err))
@@ -109,17 +94,8 @@ function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn
               json.push(...nextPage)
               return json;
             })
-            .then(json => {
-              if (processJsonFn) {
-                processJsonFn(json)
-              }
-              return json;
-            })
             .then(json => resolve(json));
         } else {
-          if (processJsonFn) {
-            processJsonFn(json)
-          }
           resolve(json);
         }
       })
@@ -136,10 +112,7 @@ function fetchPaginatedItems(url, parent, page, itemsCount, count, processJsonFn
 function fetchIssues(repo, page, issuesCount, count) {
   const url = `https://api.github.com/repos/npm/npm/issues?page=${page}` +
               `&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
-  return fetchPaginatedItems(
-    url, repo, page, issuesCount, count,
-    json => json.forEach(encodeNumberInId)
-  );
+  return fetchPaginatedItems(url, repo, page, issuesCount, count);
 }
 
 /**

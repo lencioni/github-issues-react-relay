@@ -98,7 +98,10 @@ const issueType = new GraphQLObjectType({
   name: 'Issue',
   description: 'A GitHub issue',
   fields: () => ({
-    id: globalIdField('Issue'),
+    // We can't query GitHub for individual issues based on ID--we need the
+    // number. In order to make this work with Relay, which relies on the
+    // object's ID to wire things up, I am encoding the issue number in its ID.
+    id: globalIdField('Issue', issue => `${issue.id};${issue.number}`),
     number: {
       type: GraphQLInt,
       description: 'Number of the issue',
